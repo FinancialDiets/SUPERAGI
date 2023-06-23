@@ -30,6 +30,8 @@ class ListCalendarEventsTool(BaseTool):
 
     def _execute(self, start_time: str = 'None', start_date: str = 'None', end_date: str = 'None', end_time: str = 'None'):
         service = self.get_google_calendar_service()
+        print("/////////////////////////////")
+        print(service)
         if not service["success"]:
             return f"Kindly connect to Google Calendar"
         
@@ -49,7 +51,9 @@ class ListCalendarEventsTool(BaseTool):
         engine = connect_db()
         Session = sessionmaker(bind=engine)
         session = Session()
-        toolkit_id = self.tool_kit_config.tool_kit_id
+        toolkit_id = self.toolkit_config.toolkit_id
+        print("/////////////////////////")
+        print(toolkit_id)
         return GoogleCalendarCreds().get_credentials(toolkit_id)
 
     def get_event_results(self, service, date_utc):
