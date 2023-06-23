@@ -64,6 +64,7 @@ export default function ToolWorkspace({toolDetails}){
     const handleAuthenticateClick = async () => {
       authenticateGoogleCred(toolDetails.id)
         .then((response) => {
+          console.log(response.data)
           getToken(response.data);
         })
         .catch((error) => {

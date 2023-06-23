@@ -44,7 +44,7 @@ from superagi.models.organisation import Organisation
 from superagi.models.types.login_request import LoginRequest
 from superagi.models.user import User
 from superagi.tools.base_tool import BaseTool
-from superagi.models.tools_config import ToolConfig
+from superagi.models.tool_config import ToolConfig
 
 app = FastAPI()
 
@@ -396,7 +396,7 @@ async def root(Authorize: AuthJWT = Depends()):
 
 @app.get("/google/get_google_creds/toolkit_id/{toolkit_id}")
 def get_google_calendar_tool_configs(toolkit_id: int):
-    google_calendar_config = db.session.query(ToolConfig).filter(ToolConfig.tool_kit_id == toolkit_id,ToolConfig.key == "GOOGLE_CLIENT_ID").first()
+    google_calendar_config = db.session.query(ToolConfig).filter(ToolConfig.toolkit_id == toolkit_id,ToolConfig.key == "GOOGLE_CLIENT_ID").first()
     return {
         "client_id": google_calendar_config.value
     }
