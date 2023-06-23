@@ -64,8 +64,9 @@ class StableDiffusionImageGenTool(BaseTool):
             img_data = base64.b64decode(image_base64)
             final_img = Image.open(BytesIO(img_data))
             image_format = final_img.format
-            img_byte_arr = BytesIO()
-            final_img.save(img_byte_arr, format=image_format)
+
+            image = image_name[i]
+            root_dir = get_config('RESOURCES_OUTPUT_ROOT_DIR')
 
             self.resource_manager.write_binary_file(image_names[i], img_byte_arr.getvalue())
 

@@ -9,6 +9,7 @@ from fastapi import APIRouter
 from pydantic_sqlalchemy import sqlalchemy_to_pydantic
 
 from superagi.models.agent_workflow import AgentWorkflow
+from superagi.models.toolkit import ToolKit
 from superagi.models.types.agent_with_config import AgentWithConfig
 from superagi.models.agent_config import AgentConfiguration
 from superagi.models.agent_execution import AgentExecution
@@ -157,9 +158,22 @@ def create_agent_with_config(agent_with_config: AgentWithConfig,
         if tool is None:
             # Tool does not exist, throw 404 or handle as desired
             raise HTTPException(status_code=404, detail=f"Tool with ID {tool_id} does not exist. 404 Not Found.")
+
+    agent_toolkit_tools = []
+    for toolkit_id in agent_with_config.toolkits:
+        toolkit_tools = db.session.query(Tool).filter(Tool.toolkit_id == toolkit_id).all()
+        for tool in toolkit_tools:
+            tool = db.session.query(Tool).filter(Tool.id == tool.id).first()
+            if tool is None:
+                # Tool does not exist, throw 404
+                raise HTTPException(status_code=404, detail=f"Tool with ID {tool_id} does not exist. 404 Not Found.")
+            else:
+                agent_toolkit_tools.append(tool.id)
+
+    agent_with_config.tools.extend(agent_toolkit_tools)
     db_agent = Agent.create_agent_with_config(db, agent_with_config)
     start_step_id = AgentWorkflow.fetch_trigger_step_id(db.session, db_agent.agent_workflow_id)
-    # Creating an execution with CREATED status
+    # Creating an execution with RUNNING status
     execution = AgentExecution(status='RUNNING', last_execution_time=datetime.now(), agent_id=db_agent.id,
                                name="New Run", current_step_id=start_step_id)
 
